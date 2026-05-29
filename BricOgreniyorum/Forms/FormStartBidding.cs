@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using System.Linq;
 using BricOgreniyorum.Class;
 
 namespace BricOgreniyorum.Forms
@@ -22,37 +23,38 @@ namespace BricOgreniyorum.Forms
             InitializeComponent();
         }
 
-        private void btnBid_Click(object sender, EventArgs e)
+        private void BtnBid_Click(object sender, EventArgs e)
         {
             Result = BiddingChoice.BidForContract;
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
 
-        private void btnSpecify_Click(object sender, EventArgs e)
+        private void BtnSpecify_Click(object sender, EventArgs e)
         {
             Result = BiddingChoice.SpecifyContract;
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
 
-        private void btnRotate_Click(object sender, EventArgs e)
+        private void BtnRotate_Click(object sender, EventArgs e)
         {
             Result = BiddingChoice.RotateHands;
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
 
-        private void btnNext_Click(object sender, EventArgs e)
+        private void BtnNext_Click(object sender, EventArgs e)
         {
             Result = BiddingChoice.NextDeal;
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
 
-        private void btnAbandon_Click(object sender, EventArgs e)
+        private void BtnAbandon_Click(object sender, EventArgs e)
         {
             Result = BiddingChoice.Abandon;
+            // Orijinal davranış: sadece dialog sonucunu ayarla ve kapat
             this.DialogResult = DialogResult.OK;
             this.Close();
         }

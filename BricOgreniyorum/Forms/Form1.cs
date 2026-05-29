@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using BricOgreniyorum.Class;
 
@@ -9,6 +10,14 @@ namespace BricOgreniyorum.Forms
 {
     public partial class Form1 : Form
     {
+        private const int SW_RESTORE = 9;
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
         private readonly GameManager _gameManager;
 
         public Form1(GameManager gameManager)
@@ -53,7 +62,43 @@ namespace BricOgreniyorum.Forms
                         Form1_Load_1(sender, e);
                         break;
                     case FormStartBidding.BiddingChoice.Abandon:
-                        Application.Exit();
+                        // Eğer kullanıcı teklif başlamadan vazgeçerse, oyun formunu kapat ve ana menüyü göster
+                        // Önce ana menüyü görünür yapmaya çalış
+                        if (!(Application.OpenForms["FormMainMenu"] is Form mainForm))
+                        {
+                            mainForm = Application.OpenForms.Cast<Form>().FirstOrDefault(f => f.GetType().Name == "FormMainMenu");
+                        }
+
+                        if (mainForm != null && !mainForm.IsDisposed)
+                        {
+                            try
+                            {
+                                // Garantili görünürlük ve öne getirme (API ile restore)
+                                if (!mainForm.Visible) mainForm.Show();
+                                if (mainForm.WindowState == FormWindowState.Minimized) mainForm.WindowState = FormWindowState.Normal;
+                                // Restore and bring to front using Win32
+                                ShowWindow(mainForm.Handle, SW_RESTORE);
+                                SetForegroundWindow(mainForm.Handle);
+                                mainForm.BringToFront();
+                                mainForm.Activate();
+                            }
+                            catch { }
+                        }
+                        else
+                        {
+                            // Mevcut ana menü bulunamadıysa yeni bir tane oluşturup göster
+                            try
+                            {
+                                var newMain = new FormMainMenu();
+                                newMain.Show();
+                                ShowWindow(newMain.Handle, SW_RESTORE);
+                                SetForegroundWindow(newMain.Handle);
+                            }
+                            catch { }
+                        }
+
+                        // Form1'i kapat
+                        this.BeginInvoke((Action)(() => this.Close()));
                         break;
                 }
             }
